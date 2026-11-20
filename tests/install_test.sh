@@ -64,6 +64,20 @@ for name in "${commands[@]}"; do
   [ -f "$tmp/all/.claude/commands/$name" ] || fail "claude command $name"
 done
 
+"$REPO_DIR/install.sh" --target opencode --dest "$tmp/trigger" --with-trigger >/dev/null
+[ -L "$tmp/trigger/.config/opencode/plugins/reflect-trigger" ] || fail "trigger is not a symlink"
+[ -f "$tmp/trigger/.config/opencode/plugins/reflect-trigger/index.ts" ] || fail "trigger index"
+[ -f "$tmp/trigger/.config/opencode/plugins/reflect-trigger/patterns.mjs" ] || fail "trigger patterns"
+
+"$REPO_DIR/install.sh" --target opencode --dest "$tmp/trigger-copy" --with-trigger --copy >/dev/null
+[ -d "$tmp/trigger-copy/.config/opencode/plugins/reflect-trigger" ] || fail "trigger copy dir"
+[ ! -L "$tmp/trigger-copy/.config/opencode/plugins/reflect-trigger" ] || fail "trigger copy should not symlink"
+[ -f "$tmp/trigger-copy/.config/opencode/plugins/reflect-trigger/index.ts" ] || fail "trigger copy index"
+
+if "$REPO_DIR/install.sh" --target codex --dest "$tmp/trigger-bad" --with-trigger >/dev/null 2>&1; then
+  fail "--with-trigger should reject codex"
+fi
+
 mkdir -p "$tmp/project"
 (
   cd "$tmp/project"

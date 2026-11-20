@@ -18,20 +18,27 @@ Options:
   --copy                                       Copy files instead of symlinking
   --dest <dir>                                 Base directory for the install
                                                (default: $HOME for user, $PWD for project)
+  --with-trigger                               Install the OpenCode reflect trigger
   --force                                      Replace an existing destination
   --dry-run                                    Print actions without changing anything
   -h, --help                                   Show this help
 
 Layout:
   user:    ~/.config/opencode/skills, ~/.config/opencode/commands,
+           ~/.config/opencode/plugins/reflect-trigger (--with-trigger),
            ~/.claude/skills, ~/.claude/commands,
            ~/.agents/skills
   project: .opencode/skills, .opencode/commands,
+           .opencode/plugins/reflect-trigger (--with-trigger),
            .claude/skills, .claude/commands,
            .agents/skills
 
 Cursor and Codex share .agents/skills. The command is installed for OpenCode and
 Claude Code; Cursor and Codex invoke the skill directly.
+
+The reflect trigger is an OpenCode prompt hook. After installing it, add
+"./plugins/reflect-trigger" to the plugins array in opencode.json and restart
+OpenCode. Claude Code, Cursor, and Codex use the skill description instead.
 EOF
 }
 
@@ -39,6 +46,7 @@ target=all
 scope=user
 mode=symlink
 dest=
+with_trigger=0
 force=0
 dry_run=0
 
@@ -59,6 +67,10 @@ while [ $# -gt 0 ]; do
     --dest)
       dest="${2:?--dest needs a value}"
       shift 2
+      ;;
+    --with-trigger)
+      with_trigger=1
+      shift
       ;;
     --force)
       force=1
@@ -95,6 +107,16 @@ case "$scope" in
     exit 2
     ;;
 esac
+
+if [ "$with_trigger" -eq 1 ]; then
+  case "$target" in
+    opencode|all) ;;
+    *)
+      echo "--with-trigger requires --target opencode or all" >&2
+      exit 2
+      ;;
+  esac
+fi
 
 if [ -n "$dest" ]; then
   base="$dest"
@@ -178,9 +200,16 @@ install_commands() {
   done
 }
 
+install_trigger() {
+  install_one "$REPO_DIR/plugins/opencode/reflect-trigger" "$opencode_root/plugins/reflect-trigger"
+}
+
 install_for_opencode() {
   install_skills "$opencode_root/skills"
   install_commands "$opencode_root/commands"
+  if [ "$with_trigger" -eq 1 ]; then
+    install_trigger
+  fi
 }
 
 install_for_claude() {
@@ -249,6 +278,14 @@ if [ "$dry_run" -eq 0 ]; then
       say "Codex: /skills then select a skill, or \$<skill>"
       ;;
   esac
+  if [ "$with_trigger" -eq 1 ]; then
+    config="$opencode_root/opencode.json"
+    if grep -q 'reflect-trigger' "$config" 2>/dev/null; then
+      say "OpenCode trigger: already referenced in $config"
+    else
+      say "OpenCode trigger: add \"./plugins/reflect-trigger\" to plugins in $config"
+    fi
+  fi
   say "Skills: ${skill_names[*]}"
   say "Commands: ${command_names[*]}"
 fi

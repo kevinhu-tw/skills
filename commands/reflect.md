@@ -12,5 +12,6 @@ The user invoked `/reflect` with these arguments:
 $ARGUMENTS
 
 An empty argument means the current session. A skill name means reflect on that
-skill. Propose the smallest patch with evidence. Do not edit a skill without
-approval.
+skill. An explicit workflow change is approval to apply the smallest patch and
+report the diff. An exploratory change is a proposal, so ask before editing. If
+the message also contains a task, finish it first unless the change affects it.

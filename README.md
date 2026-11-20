@@ -95,17 +95,49 @@ approval before implementation.
 
 Turns a correction into a durable skill change. It looks for repeated
 corrections, missing steps, ambiguous instructions, wrong triggers, stale
-references, and output mismatches, then proposes the smallest patch.
+references, and output mismatches, then applies or proposes the smallest patch.
+
+An explicit change ("from now on", "going forward", "next time", "always",
+"never", "remember this", "make this the default") is approval to apply the
+patch. An exploratory change ("maybe we should", "what do you think") gets a
+proposal and one question.
 
 It prefers editing an existing skill over creating a new one. It only creates a
 new skill when the loop is distinct, recurring, and has a stable trigger, input,
-output, and stop condition. It applies a patch only with approval.
+output, and stop condition.
 
 ```text
 /reflect
 /reflect pr-create
 /reflect this session
 ```
+
+### Automatic trigger
+
+OpenCode can attach `reflect` from a prompt hook. The hook matches durable
+workflow phrases, attaches the skill, and appends a one-turn directive. It does
+nothing for ordinary prompts. Install and configure it:
+
+```bash
+./install.sh --target opencode --with-trigger
+```
+
+Then add the installed plugin to `~/.config/opencode/opencode.json` and restart
+OpenCode:
+
+```json
+{
+  "plugins": ["./plugins/reflect-trigger"]
+}
+```
+
+The path is relative to the config directory. The installer symlinks the plugin
+by default; `--copy` copies it. `--with-trigger` requires `--target opencode` or
+`--target all`.
+
+Claude Code, Cursor, and Codex have no shared prompt hook. There the skill
+description is the trigger. For a stronger fallback, append
+`templates/agents-snippet.md` to your global `AGENTS.md` or `CLAUDE.md`.
 
 ## Install
 
@@ -132,6 +164,7 @@ Other options:
 ./install.sh --target all --copy
 ./install.sh --target all --dry-run
 ./install.sh --target all --dest /tmp/skills-test
+./install.sh --target opencode --with-trigger
 ```
 
 The default is a symlink, so edits in this clone update the installed skills.
@@ -144,6 +177,7 @@ reinstall after moving it.
 | Agent | Skills | Commands | Invocation |
 | --- | --- | --- | --- |
 | OpenCode | `~/.config/opencode/skills/<skill>` | `~/.config/opencode/commands/<command>.md` | `/pr-create`, `/pr-review`, `/spec`, `/reflect`, `/quiz` |
+| OpenCode trigger | `~/.config/opencode/plugins/reflect-trigger` | none | automatic on durable workflow phrases |
 | Claude Code | `~/.claude/skills/<skill>` | `~/.claude/commands/<command>.md` | the same commands, or `/<skill>` |
 | Cursor | `~/.agents/skills/<skill>` | none | `/` then select the skill |
 | Codex | `~/.agents/skills/<skill>` | none | `/skills` then select the skill, or `$<skill>` |
@@ -174,9 +208,17 @@ commands/
   pr-review.md
   spec.md
   reflect.md
+plugins/
+  opencode/
+    reflect-trigger/
+      index.ts
+      patterns.mjs
+templates/
+  agents-snippet.md
 install.sh
 tests/
   install_test.sh
+  reflect_trigger_test.mjs
 ```
 
 Add a skill under `skills/<name>/SKILL.md`. Add a command under
@@ -196,7 +238,9 @@ Local checks used for this repository:
 
 ```bash
 ./tests/install_test.sh
+node tests/reflect_trigger_test.mjs
 ./install.sh --target all --dry-run
+./install.sh --target opencode --with-trigger --dry-run
 ```
 
 ## Skill conventions
@@ -222,8 +266,8 @@ Local checks used for this repository:
   repository you are working on.
 - `spec` writes a document only when asked and stops for approval before
   implementation.
-- `reflect` proposes a patch before editing a skill. It does not rewrite the
-  library on its own.
+- `reflect` applies an explicit workflow change and proposes an exploratory one
+  before editing a skill. It does not rewrite the library on its own.
 - `repo-quiz` is read-only. It never edits the repository.
 - The `/quiz` command drops a leading `me` and `about`, so
   `/quiz me about the cli workflow of decoy` scopes the quiz to
