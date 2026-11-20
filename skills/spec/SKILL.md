@@ -72,6 +72,13 @@ section with an owner and a default.
 
 ## Write the spec
 
+Start with a one-page executive summary and the decision points. The summary
+has three parts: Background (why), What (overall workflow), and How (how to do
+it). List the decision points as a short table. Then expand in this order:
+overall context, options and trade-offs, hacks and things worth noting, design,
+test plan, implementation plan. The summary is for the reader who stops there;
+the rest carries the evidence.
+
 Use this structure unless the repository has a stricter template.
 
 ```markdown
@@ -81,6 +88,23 @@ Status: draft | proposed | accepted | superseded
 Date: <YYYY-MM-DD>
 Owners: <names>
 Links: <issue, prior ADR, PR, design discussion>
+
+## Executive summary
+
+**Background (why):** <the problem in observable terms.>
+
+**What (overall workflow):** <the end-to-end path in a few steps.>
+
+**How (how to do it):** <the mechanism, entry points, and artifacts.>
+
+**Decision points:**
+
+| ID | Decision | Proposed |
+| --- | --- | --- |
+| D1 | <what must be decided> | <default> |
+
+**Hacks and things worth noting:** <workarounds, sharp edges, and facts that
+change how the design is read.>
 
 ## Problem
 
@@ -242,6 +266,8 @@ superseded. Do not edit the record as if the earlier choice never existed.
 
 Read the document and the code it references. Then check:
 
+- The executive summary states Background, What, How, and the decision points.
+- The expansion covers context, trade-offs, and hacks worth noting.
 - The problem is observable, not a solution in disguise.
 - Goals are measurable, and non-goals are explicit.
 - Constraints are real, not aspirational.
