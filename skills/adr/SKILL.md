@@ -1,13 +1,18 @@
 ---
 name: adr
-description: Draft one engineering Architecture Decision Record in the repository's existing ADR system. Reads the ADR guide, index, prior decisions, code, and evidence; writes one proposed record and updates the index; stops before implementation. Use when the user says write an ADR, draft an ADR, record this decision, add a decision record, or invokes /adr. For a proposal or design spec, use spec.
+description: Draft one engineering Architecture Decision Record in the repository's existing ADR system. Reads the ADR guide, index, prior decisions, code, and evidence; writes one proposed record and updates the index; stops before implementation. Use when the user says write an ADR, draft an ADR, record this decision, add a decision record, or invokes /adr. For an implementation plan, use spec.
 ---
 
 # ADR
 
 One decision, one record. The job is to make a decision reviewable and durable,
-not to write a design document. Use the `spec` skill for a proposal, a design
-spec, or an implementation plan.
+not to write a design document. Use the `spec` skill for the implementation plan.
+
+## Relationship to spec
+
+An ADR owns the decision and its evidence. A spec owns the implementation plan.
+Do not put code-level steps, file-by-file order, or a test plan in an ADR. If the
+request is to plan the code, use `spec`.
 
 ## Input
 
@@ -139,4 +144,4 @@ ambiguous or an accepted ADR blocks it, ask one question and stop.
 - Do not create a second record when an existing proposed ADR is the right home.
 - Do not duplicate a guide the repository already has. Read and follow it.
 - Do not use dashes as punctuation.
-- Do not turn the ADR into a design spec. Use `spec` for that.
+- Do not turn the ADR into an implementation spec. Use `spec` for that.

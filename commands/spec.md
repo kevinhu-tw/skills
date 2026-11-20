@@ -1,6 +1,6 @@
 ---
-description: "Write or review a proposal or design spec"
-argument-hint: "[topic | path]"
+description: "Write or review an implementation spec"
+argument-hint: "[ADR | topic | path]"
 subagent: false
 ---
 
@@ -11,7 +11,8 @@ The user invoked `/spec` with these arguments:
 
 $ARGUMENTS
 
-An empty argument means ask for the topic, the problem, and the constraints. A
-path means review that document. Choose the existing document when one is the
-right home. Number the decisions, state the non-goals, and stop for approval
-before implementation. For drafting a single ADR, use `adr`.
+An empty argument means ask for the accepted decision or ADR, the code to change,
+and the constraints. A topic or ADR means write an implementation plan. A path
+means review that spec. Read the accepted ADRs first, number the implementation
+decisions, state the non-goals, and stop for approval before implementation. For
+the decision record, use `adr`.

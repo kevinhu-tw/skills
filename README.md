@@ -11,8 +11,8 @@ Code, Cursor, and Codex read.
 | `repo-quiz` | `/quiz` | Adaptive oral exam over a repo or topic, graded against the code |
 | `pr-create` | `/pr-create` | Validate a branch, self-review the diff, and open or update a PR |
 | `pr-review` | `/pr-review` | Explain a change, then review architecture, design, implementation, and security |
-| `adr` | `/adr` | Draft one engineering ADR in the repository's existing ADR system |
-| `spec` | `/spec` | Write or review a proposal or design spec; review an ADR |
+| `adr` | `/adr` | Record one decision and its evidence in the repository's ADR system |
+| `spec` | `/spec` | Write or review an implementation spec that an AI agent can execute |
 | `reflect` | `/reflect` | Turn corrections into the smallest useful skill patch |
 
 ### repo-quiz
@@ -76,10 +76,11 @@ default.
 
 Drafts one Architecture Decision Record in the repository's own ADR system. It
 reads the ADR guide, index, prior decisions, code, and evidence, writes one
-proposed record, and updates the index. It does not write code or a design
-document.
+proposed record, and updates the index. It does not write code or the
+implementation plan.
 
-Use `spec` for a proposal, a design spec, or an implementation plan.
+Use `spec` for the implementation plan. An ADR records the decision and its
+evidence; the spec records how to execute it.
 
 ```text
 /adr
@@ -89,23 +90,24 @@ Use `spec` for a proposal, a design spec, or an implementation plan.
 
 ### spec
 
-Writes and reviews proposals and design specs, and reviews an existing ADR. A
-spec is a decision document, not an essay. It must let an implementer build
-without guessing. For drafting one ADR, use `adr`.
+Writes and reviews the implementation spec an AI agent follows to produce code.
+It reads the accepted ADRs, then specifies interfaces, data flow, state, errors,
+tests, and commit-sized steps. An ADR records the decision and evidence; a spec
+records how to execute it. For the decision record, use `adr`.
 
-The skill covers the problem, goals, non-goals, constraints, current behavior,
-options, numbered decisions, interfaces, data flow, state, configuration, errors,
-concurrency, security, observability, migration, rollback, test plan, and a
-commit-sized implementation plan.
+The skill covers the code surface, goals and non-goals, constraints, current
+behavior, implementation options, interfaces, data flow, state, configuration,
+errors, concurrency, security, observability, migration, rollback, test plan, and
+a commit-sized implementation plan.
 
-It chooses the existing document when one is the right home. It numbers every
-material decision, gives each open question an owner and a default, and stops for
-approval before implementation.
+It cites the ADRs it executes, numbers every implementation choice, gives each
+open question an owner and a default, and stops for approval before
+implementation.
 
 ```text
 /spec
-/spec typed decision training
-/spec review docs/proposals/registry-auth.md
+/spec docs/adrs/0012-node-level-rocjitsu-daemon.md
+/spec review docs/specs/node-daemon.md
 ```
 
 ### reflect
@@ -284,10 +286,12 @@ node tests/reflect_trigger_test.mjs
 
 - `pr-create` and `pr-review` use `gh`. It must be authenticated for the
   repository you are working on.
-- `adr` drafts one record in the repository's ADR system and stops before code.
-  It reads the repository's guide before using its default template.
-- `spec` writes a proposal or design spec only when asked and stops for approval
-  before implementation. It reviews ADRs but does not draft them.
+- `adr` records one decision and its evidence in the repository's ADR system. It
+  reads the repository's guide before using its default template and stops before
+  the implementation plan.
+- `spec` turns accepted ADRs into an implementation plan an AI agent can execute.
+  It does not record or change decisions, and it stops for approval before
+  implementation.
 - `reflect` applies an explicit workflow change and proposes an exploratory one
   before editing a skill. It does not rewrite the library on its own.
 - `repo-quiz` is read-only. It never edits the repository.

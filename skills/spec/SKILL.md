@@ -1,48 +1,51 @@
 ---
 name: spec
-description: Write or review a proposal or design spec, or review an ADR. Covers the problem, goals, non-goals, constraints, options, numbered decisions, interfaces, data flow, failure modes, migration, rollback, test plan, and commit-sized steps. Use when the user says write a spec, design this, write a proposal, review this design, review an ADR, or asks how to implement a feature before coding. For drafting a single ADR, use the adr skill. Stop for approval before implementation.
+description: Write or review an implementation spec that an AI agent can execute. Reads the accepted ADRs and turns them into interfaces, data flow, state, errors, tests, and commit-sized steps. Use when the user says write an implementation spec, plan the implementation, turn this ADR into a plan, or asks how to build an approved design. For recording a decision, use the adr skill. Stop for approval before implementation.
 ---
 
 # Spec
 
-A spec is a decision document, not an essay. It exists so an implementer can build
-the change without guessing and a reviewer can disagree with a decision before
-the code exists.
+A spec is an execution document, not an essay. It exists so an AI agent can
+produce the code without guessing and a reviewer can check the plan against the
+accepted decisions.
 
 The skill has two modes:
 
-1. Write a new ADR, proposal, or design spec.
-2. Review an existing one against the code, the constraints, and its own claims.
+1. Write an implementation spec from accepted decisions.
+2. Review an implementation spec against the code and the ADRs it cites.
 
-In both modes, the output is a decision record with evidence, not a summary of
-opinions.
+In both modes, the output is a plan with evidence, not a summary of opinions.
+
+## Relationship to ADRs
+
+An ADR records a decision and its evidence. A spec records how to execute that
+decision. Read the accepted ADRs first and cite them by number. Do not record,
+change, or re-litigate an architecture decision in a spec. If a required decision
+is missing, stop and draft an ADR with the `adr` skill.
 
 ## Input
 
-- No argument: ask for the topic, the problem, and the constraints.
-- A topic: write a new spec.
-- A path: review that document.
-- An existing decision: update it when it is the right home, otherwise create a
-  proposal or a new ADR.
+- No argument: ask for the accepted decision or ADR, the code to change, and the
+  constraints.
+- A topic or ADR: write an implementation spec.
+- A path: review that spec.
+- An existing spec: update it. If the decision changed, update the ADR first.
 
 ## Choose the document
 
-Use the repository's existing convention first. Read `docs/adr`, `docs/rfcs`,
-`docs/proposals`, `AGENTS.md`, and the README before creating a new file.
+Use the repository's existing convention first. Read `docs/adrs`, `docs/adr`,
+`docs/rfcs`, `docs/proposals`, `AGENTS.md`, and the README before creating a new
+file.
 
-- ADR: one decision. Draft it with the `adr` skill; review it here. Accepted ADRs
+- ADR: records one decision and its evidence. Use the `adr` skill. Accepted ADRs
   are historical records.
-- Proposal: a larger change with options and a recommendation, written before the
-  decision is final. It can be revised as the discussion changes.
-- Design spec: the accepted design with enough detail to implement. It can be
-  revised as implementation reveals new facts, but material changes need a
-  decision ledger entry.
+- Implementation spec: the plan an AI agent follows to produce code. This skill.
+  It cites the ADRs it executes and does not replace them.
 
-Prefer updating an existing document when the content belongs there. Do not
-create a second record for a wording fix, an added consequence, or a missing
-reference. If an accepted ADR's decision changes, create a new ADR that
-supersedes it, mark the old one superseded, and link both. Do not rewrite history
-silently.
+Prefer updating an existing spec when the content belongs there. Do not create a
+second plan for a wording fix, an added consequence, or a missing reference. If
+an accepted ADR's decision changes, create a new ADR that supersedes it, then
+update the spec. Do not rewrite history silently.
 
 Do not create a new document when an existing one is the right home. File sprawl
 is a design failure.
@@ -59,45 +62,48 @@ Read enough to design against reality:
 
 Then state:
 
-- The problem in observable terms. What happens today, to whom, and how often?
-- The success criteria. How will we know the change worked?
+- The ADR or decision this spec executes.
+- The code surface to change: packages, commands, APIs, state, and tests.
+- The acceptance checks the code must pass. How will we know it works?
 - The non-goals. What is explicitly out of scope?
 - The constraints. Compatibility, performance, security, operations, cost, team,
   deadline, and anything that cannot change.
-- The assumptions. What must be true for the design to hold?
-- The open decisions. What must the user decide before implementation?
+- The assumptions. What must be true for the plan to hold?
+- The implementation choices still open, with a default.
 
-Ask only questions that block the design. Put the rest in the open questions
+Ask only questions that block the plan. Put the rest in the open questions
 section with an owner and a default.
 
 ## Write the spec
 
-Start with a one-page executive summary. Use formal headings, not question words
-such as why, what, and how: Scope, Architecture, Design decisions, Workarounds,
-Delivery plan, Risks. List the decisions as a short table. Then expand in this
-order: Context, Goals and non-goals, Options and trade-offs, Design, Constraints
-and workarounds, Test plan, Implementation plan. The summary is for the reader
-who stops there; the rest carries the evidence.
+Start with a one-page implementation summary. Use formal headings, not question
+words such as why, what, and how: Scope, Execution, Implementation decisions,
+Workarounds, Delivery plan, Risks. List the decisions as a short table. Then
+expand in this order: Context and ADRs, Goals and non-goals, Implementation
+options, Design, Constraints and workarounds, Test plan, Implementation plan.
+The summary is for the reader who stops there; the rest carries the detail an
+agent needs to code.
 
 Use this structure unless the repository has a stricter template.
 
 ```markdown
 # <Title>
 
-Status: draft | proposed | accepted | superseded
+Status: draft | approved | superseded
 Date: <YYYY-MM-DD>
+ADRs: <ADR numbers this plan executes>
 Owners: <names>
-Links: <issue, prior ADR, PR, design discussion>
+Links: <issue, ADR, PR, design discussion>
 
-## Executive summary
+## Implementation summary
 
-**Scope:** <the problem in observable terms, and what this change does and does
+**Scope:** <the decision this plan executes, and what the change does and does
 not cover.>
 
-**Architecture:** <the end-to-end path and the mechanism: components, entry
-points, and artifacts.>
+**Execution:** <the end-to-end path and mechanism: components, entry points, and
+artifacts.>
 
-**Design decisions:**
+**Implementation decisions:**
 
 | ID | Decision | Proposed |
 | --- | --- | --- |
@@ -106,9 +112,10 @@ points, and artifacts.>
 **Workarounds:** <hacks, sharp edges, and facts that change how the design is
 read.>
 
-## Problem
+## Context and ADRs
 
-<Observable current behavior, who is affected, and why it matters.>
+<The accepted ADRs this plan executes, the current behavior, and the code that
+must change.>
 
 ## Goals
 
@@ -127,7 +134,9 @@ read.>
 
 <How the system works today, with file references. Include the workaround.>
 
-## Options
+## Implementation options
+
+<Only choices the ADR left open. Architecture options belong in the ADR.>
 
 ### Option A: <name>
 
@@ -137,11 +146,12 @@ read.>
 
 <How it works. Trade-offs. Cost. Risk. Reversibility.>
 
-## Decision
+## Chosen implementation
 
-<The chosen option and the reason. What would make this decision wrong?>
+<The implementation path and the ADR it executes. What would make this plan
+wrong?>
 
-## Decision ledger
+## Implementation decisions
 
 | ID | Decision | Choice | Alternatives | Consequence | Status |
 | --- | --- | --- | --- | --- | --- |
@@ -222,7 +232,7 @@ what is left behind.>
 ```
 
 Adapt the headings to the repository. Do not leave empty sections. If a section
-does not apply, remove it and say why in the decision ledger.
+does not apply, remove it and say why in the implementation decisions.
 
 ## Detail level
 
@@ -239,42 +249,47 @@ Name real things where they are known:
 - Test names and assertions.
 
 Do not write a line-by-line implementation. A spec that leaves no room to
-implement is a liability. A spec that leaves the hard decisions open is worse.
+implement is a liability. A spec that leaves the hard implementation choices open
+is worse.
 
 Every requirement must be testable. Replace vague goals with a command, a metric,
 an observable state, or a test assertion. "Fast", "robust", and "clean" are not
 requirements until they have a threshold.
 
-## Decision ledger
+## Implementation decisions
 
-Every material decision gets an entry:
+Every material implementation choice gets an entry:
 
-- ID, so the implementation and review can refer to it.
-- The decision in one sentence.
-- The chosen option.
+- ID, so the code and review can refer to it.
+- The choice in one sentence.
 - The alternatives and why they lost.
 - The consequence, including what becomes harder.
 - The status: open, decided, superseded.
 
+Architecture decisions belong in an ADR, not here. If an implementation choice
+changes an accepted decision, stop and supersede the ADR.
+
 Open questions get an owner and a default. If the user does not answer, the
 default is what the implementer will do. No silent assumptions.
 
-If a decision changes during implementation, add a new row or mark the old one
-superseded. Do not edit the record as if the earlier choice never existed.
+If an implementation choice changes during the work, add a new row or mark the
+old one superseded. Do not edit the record as if the earlier choice never
+existed.
 
 ## Review a spec
 
-Read the document and the code it references. Then check:
+Read the document, the code it references, and the ADRs it cites. Then check:
 
-- The executive summary uses formal headings: scope, architecture, design
-  decisions, and workarounds or risks. No why, what, or how labels.
-- The expansion covers context, options and trade-offs, and workarounds.
-- The problem is observable, not a solution in disguise.
+- The implementation summary uses formal headings: scope, execution,
+  implementation decisions, and workarounds or risks. No why, what, or how
+  labels.
+- The expansion covers context and ADRs, implementation options, and workarounds.
+- The spec cites the accepted ADRs it executes and does not re-decide them.
 - Goals are measurable, and non-goals are explicit.
 - Constraints are real, not aspirational.
-- At least two options were considered, with honest trade-offs.
-- The chosen option follows from the constraints and the evidence.
-- Every material decision has a consequence and a rollback.
+- Implementation options were considered where the ADR left a choice.
+- The plan follows the accepted ADRs and the constraints.
+- Every implementation choice has a consequence and a rollback.
 - Interfaces, data flow, state, errors, concurrency, and failure modes are
   specified.
 - Security and operability are covered.
@@ -291,32 +306,33 @@ numbers, unless the document is stable. Each finding needs:
 ```text
 [medium] Design, State and lifecycle: <what is missing or wrong>.
 Consequence: <what the implementer will have to guess, or what will break>.
-Fix: <the section or decision that must change>.
+Fix: <the section or implementation choice that must change>.
 ```
 
 End with one verdict: approve, revise, or reject, and the top three changes.
 
 ## Stop for approval
 
-Present the spec, the decision ledger, and the open questions. Stop.
+Present the spec, the implementation decisions, and the open questions. Stop.
 
 Do not write code, edit production files, or open a PR until the user approves the
 spec. If the user asks to implement, confirm the approved decisions and hand off
 to the implementation flow.
 
-If the user asks for a smaller step, propose the smallest decision that unblocks
-implementation. Do not turn the request into a full design program.
+If the user asks for a smaller step, propose the smallest implementation choice
+that unblocks the work. Do not turn the request into a full design program.
 
 ## Guardrails
 
 - Do not invent requirements, constraints, or user intent.
 - Do not hide a trade-off in a recommendation.
 - Do not create a new document when an existing one is the right home.
-- Do not rewrite an accepted decision silently. Supersede it.
+- Do not change an accepted decision in a spec. Supersede the ADR first.
+- Do not turn a spec into an ADR. Decisions and evidence belong in the ADR.
 - Do not write a vague architecture essay. Every section must change what the
   implementer does.
 - Do not over-specify code that is cheap to change during implementation.
 - Do not use dashes as punctuation.
-- Do not use question words as headings. Use Scope, Architecture, Design
+- Do not use question words as headings. Use Scope, Execution, Implementation
   decisions, Workarounds, Risks.
 - Stop for approval before implementation.
