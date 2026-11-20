@@ -210,30 +210,45 @@ case "$target" in
 esac
 
 if [ "$scope" = user ] && [ -d "$base/.config/opencode/skill" ]; then
-  say "note: OpenCode also reads $base/.config/opencode/skill; remove any duplicate repo-quiz there."
+  say "note: OpenCode also reads $base/.config/opencode/skill; remove any duplicate skill there."
 fi
 
 if [ "$dry_run" -eq 0 ]; then
+  skill_names=()
+  for src in "$SKILLS_SRC"/*/; do
+    if [ -f "${src}SKILL.md" ]; then
+      skill_names+=("$(basename "$src")")
+    fi
+  done
+  command_names=()
+  for src in "$COMMANDS_SRC"/*.md; do
+    if [ -e "$src" ]; then
+      command_names+=("$(basename "$src" .md)")
+    fi
+  done
+
   say ""
   say "Installed for $target ($scope scope)."
   case "$target" in
     opencode|all)
-      say "OpenCode: /quiz me about <topic>"
+      say "OpenCode: /<command>, for example /pr-create or /quiz"
       ;;
   esac
   case "$target" in
     claude|all)
-      say "Claude Code: /quiz me about <topic> (or /repo-quiz)"
+      say "Claude Code: /<command> or /<skill>"
       ;;
   esac
   case "$target" in
     cursor|all)
-      say "Cursor: / then select repo-quiz"
+      say "Cursor: / then select a skill"
       ;;
   esac
   case "$target" in
     codex|all)
-      say "Codex: /skills then select repo-quiz, or \$repo-quiz"
+      say "Codex: /skills then select a skill, or \$<skill>"
       ;;
   esac
+  say "Skills: ${skill_names[*]}"
+  say "Commands: ${command_names[*]}"
 fi

@@ -4,7 +4,17 @@ Reusable engineering skills for coding agents. Each skill is a `SKILL.md` file
 under `skills/`; the installer links it into the directories OpenCode, Claude
 Code, Cursor, and Codex read.
 
-## repo-quiz
+## Skills
+
+| Skill | Command | What it does |
+| --- | --- | --- |
+| `repo-quiz` | `/quiz` | Adaptive oral exam over a repo or topic, graded against the code |
+| `pr-create` | `/pr-create` | Validate a branch, self-review the diff, and open or update a PR |
+| `pr-review` | `/pr-review` | Explain a change, then review architecture, design, implementation, and security |
+| `spec` | `/spec` | Write or review an ADR, proposal, or design spec that directs implementation |
+| `reflect` | `/reflect` | Turn corrections into the smallest useful skill patch |
+
+### repo-quiz
 
 An adaptive oral exam over a codebase. It maps the repository, writes an
 evidence-backed answer key before each question, asks one question at a time,
@@ -14,16 +24,88 @@ It tests architecture, flow, invariants, failure modes, configuration, design
 rationale, and implementation nuance. The skill keeps its question bank and
 grades in the session temp directory, never in the repository.
 
-Invoke it with a topic or with the current repository:
-
 ```text
 /quiz me about the cli workflow of decoy
 /quiz me about the fault injector
 /quiz
 ```
 
-`/quiz` is a convenience command for OpenCode and Claude Code. Cursor and Codex
-invoke the skill directly.
+### pr-create
+
+Takes a branch from "works on my machine" to a reviewable pull request. It runs
+the project's format, lint, build, unit, and end-to-end gates, gathers exact
+testing evidence, self-reviews the final diff, and writes the PR body in a fixed
+format: Summary, What changed, Why, Implications, Reviewer focus, Testing, and
+Gotchas.
+
+The PR body is for reviewers. The internal report is for the user and carries
+worktree state, design decisions, conflicts, and deferred items. The skill never
+mixes the two audiences.
+
+```text
+/pr-create
+/pr-create 7
+```
+
+### pr-review
+
+Explains the architecture and the change before judging it, then reviews:
+
+- Architecture: boundaries, dependency direction, interfaces, state ownership,
+  duplication, and fit with existing patterns.
+- Design: invariants, lifecycle, concurrency, idempotency, failure modes,
+  migration, rollback, operability, and compatibility.
+- Implementation: correctness, edge cases, resource leaks, tests, naming, dead
+  code, and comments versus behavior.
+- Security: input validation, injection, path traversal, secrets, permissions,
+  supply chain, and unsafe defaults.
+- Claims versus behavior: the PR body, comments, docs, and tests that say more
+  than the code does.
+
+Findings are ranked by severity and cite `path:line`. The skill is read-only by
+default.
+
+```text
+/pr-review https://github.com/org/repo/pull/7
+/pr-review my-branch
+/pr-review docs/adrs/0014-presenter-replaces-gpu-subtrees.md
+```
+
+### spec
+
+Writes and reviews ADRs, proposals, and design specs. A spec is a decision
+document, not an essay. It must let an implementer build without guessing.
+
+The skill covers the problem, goals, non-goals, constraints, current behavior,
+options, numbered decisions, interfaces, data flow, state, configuration, errors,
+concurrency, security, observability, migration, rollback, test plan, and a
+commit-sized implementation plan.
+
+It chooses the existing document when one is the right home. It numbers every
+material decision, gives each open question an owner and a default, and stops for
+approval before implementation.
+
+```text
+/spec
+/spec typed decision training
+/spec review docs/proposals/registry-auth.md
+```
+
+### reflect
+
+Turns a correction into a durable skill change. It looks for repeated
+corrections, missing steps, ambiguous instructions, wrong triggers, stale
+references, and output mismatches, then proposes the smallest patch.
+
+It prefers editing an existing skill over creating a new one. It only creates a
+new skill when the loop is distinct, recurring, and has a stable trigger, input,
+output, and stop condition. It applies a patch only with approval.
+
+```text
+/reflect
+/reflect pr-create
+/reflect this session
+```
 
 ## Install
 
@@ -52,25 +134,25 @@ Other options:
 ./install.sh --target all --dest /tmp/skills-test
 ```
 
-The default is a symlink, so edits in this clone update the installed skill.
+The default is a symlink, so edits in this clone update the installed skills.
 `--copy` is for agents or filesystems that do not follow symlinks. An existing
 destination is not replaced without `--force`. Symlinks point at this clone;
 reinstall after moving it.
 
 ## Where it installs
 
-| Agent | Skill | Command | Invocation |
+| Agent | Skills | Commands | Invocation |
 | --- | --- | --- | --- |
-| OpenCode | `~/.config/opencode/skills/repo-quiz` | `~/.config/opencode/commands/quiz.md` | `/quiz me about <topic>` |
-| Claude Code | `~/.claude/skills/repo-quiz` | `~/.claude/commands/quiz.md` | `/quiz me about <topic>` or `/repo-quiz` |
-| Cursor | `~/.agents/skills/repo-quiz` | none | `/` then select `repo-quiz` |
-| Codex | `~/.agents/skills/repo-quiz` | none | `/skills` then select `repo-quiz`, or `$repo-quiz` |
+| OpenCode | `~/.config/opencode/skills/<skill>` | `~/.config/opencode/commands/<command>.md` | `/pr-create`, `/pr-review`, `/spec`, `/reflect`, `/quiz` |
+| Claude Code | `~/.claude/skills/<skill>` | `~/.claude/commands/<command>.md` | the same commands, or `/<skill>` |
+| Cursor | `~/.agents/skills/<skill>` | none | `/` then select the skill |
+| Codex | `~/.agents/skills/<skill>` | none | `/skills` then select the skill, or `$<skill>` |
 
 Cursor and Codex share `~/.agents/skills`. A project install uses `.opencode/`,
 `.claude/`, and `.agents/` under the current directory.
 
 OpenCode also reads the legacy `~/.config/opencode/skill` directory. If an older
-copy of `repo-quiz` is there, remove it so OpenCode loads the installed version.
+copy of a skill is there, remove it so OpenCode loads the installed version.
 
 ## Layout
 
@@ -78,8 +160,20 @@ copy of `repo-quiz` is there, remove it so OpenCode loads the installed version.
 skills/
   repo-quiz/
     SKILL.md
+  pr-create/
+    SKILL.md
+  pr-review/
+    SKILL.md
+  spec/
+    SKILL.md
+  reflect/
+    SKILL.md
 commands/
   quiz.md
+  pr-create.md
+  pr-review.md
+  spec.md
+  reflect.md
 install.sh
 tests/
   install_test.sh
@@ -91,8 +185,8 @@ file; no per-skill edit is needed.
 
 ## Verify
 
-The install test uses a temporary `--dest` and does not touch your home
-directory:
+The install test uses a temporary `--dest` and covers every skill and command in
+the repository:
 
 ```bash
 ./tests/install_test.sh
@@ -105,12 +199,32 @@ Local checks used for this repository:
 ./install.sh --target all --dry-run
 ```
 
+## Skill conventions
+
+- One skill owns one recurring loop. Do not build a single "engineering" skill
+  with modes for everything.
+- A skill is self-contained. It may mention another skill, but it must work
+  without it.
+- Cite evidence: a file and line, a command and output, or a primary source.
+- Separate reviewer-facing output from internal context.
+- Verify from a clean state when the project expects it. Never report an unrun
+  check as a pass.
+- Stop at approval gates and before destructive actions.
+- Commands are thin. The skill owns the contract; the command only passes the
+  argument.
+- Write against `git`, `gh`, and the project's own commands, not one agent's
+  private tools.
+- Do not use dashes as punctuation.
+
 ## Notes
 
-- The skill is read-only. It never edits the repository.
+- `pr-create` and `pr-review` use `gh`. It must be authenticated for the
+  repository you are working on.
+- `spec` writes a document only when asked and stops for approval before
+  implementation.
+- `reflect` proposes a patch before editing a skill. It does not rewrite the
+  library on its own.
+- `repo-quiz` is read-only. It never edits the repository.
 - The `/quiz` command drops a leading `me` and `about`, so
   `/quiz me about the cli workflow of decoy` scopes the quiz to
   `the cli workflow of decoy`.
-- The skill is portable across agents: it uses `CLAUDE.md`, `AGENTS.md`, tests,
-  decision records, and code as evidence, and does not depend on one agent's
-  tools.
