@@ -11,7 +11,8 @@ Code, Cursor, and Codex read.
 | `repo-quiz` | `/quiz` | Adaptive oral exam over a repo or topic, graded against the code |
 | `pr-create` | `/pr-create` | Validate a branch, self-review the diff, and open or update a PR |
 | `pr-review` | `/pr-review` | Explain a change, then review architecture, design, implementation, and security |
-| `spec` | `/spec` | Write or review an ADR, proposal, or design spec that directs implementation |
+| `adr` | `/adr` | Draft one engineering ADR in the repository's existing ADR system |
+| `spec` | `/spec` | Write or review a proposal or design spec; review an ADR |
 | `reflect` | `/reflect` | Turn corrections into the smallest useful skill patch |
 
 ### repo-quiz
@@ -71,10 +72,26 @@ default.
 /pr-review docs/adrs/0014-presenter-replaces-gpu-subtrees.md
 ```
 
+### adr
+
+Drafts one Architecture Decision Record in the repository's own ADR system. It
+reads the ADR guide, index, prior decisions, code, and evidence, writes one
+proposed record, and updates the index. It does not write code or a design
+document.
+
+Use `spec` for a proposal, a design spec, or an implementation plan.
+
+```text
+/adr
+/adr replace the in-pod daemon with a node-level systemd unit
+/adr docs/adrs/0012-node-level-rocjitsu-daemon.md
+```
+
 ### spec
 
-Writes and reviews ADRs, proposals, and design specs. A spec is a decision
-document, not an essay. It must let an implementer build without guessing.
+Writes and reviews proposals and design specs, and reviews an existing ADR. A
+spec is a decision document, not an essay. It must let an implementer build
+without guessing. For drafting one ADR, use `adr`.
 
 The skill covers the problem, goals, non-goals, constraints, current behavior,
 options, numbered decisions, interfaces, data flow, state, configuration, errors,
@@ -176,7 +193,7 @@ reinstall after moving it.
 
 | Agent | Skills | Commands | Invocation |
 | --- | --- | --- | --- |
-| OpenCode | `~/.config/opencode/skills/<skill>` | `~/.config/opencode/commands/<command>.md` | `/pr-create`, `/pr-review`, `/spec`, `/reflect`, `/quiz` |
+| OpenCode | `~/.config/opencode/skills/<skill>` | `~/.config/opencode/commands/<command>.md` | `/adr`, `/pr-create`, `/pr-review`, `/spec`, `/reflect`, `/quiz` |
 | OpenCode trigger | `~/.config/opencode/plugins/reflect-trigger` | none | automatic on durable workflow phrases |
 | Claude Code | `~/.claude/skills/<skill>` | `~/.claude/commands/<command>.md` | the same commands, or `/<skill>` |
 | Cursor | `~/.agents/skills/<skill>` | none | `/` then select the skill |
@@ -192,6 +209,8 @@ copy of a skill is there, remove it so OpenCode loads the installed version.
 
 ```text
 skills/
+  adr/
+    SKILL.md
   repo-quiz/
     SKILL.md
   pr-create/
@@ -203,6 +222,7 @@ skills/
   reflect/
     SKILL.md
 commands/
+  adr.md
   quiz.md
   pr-create.md
   pr-review.md
@@ -264,8 +284,10 @@ node tests/reflect_trigger_test.mjs
 
 - `pr-create` and `pr-review` use `gh`. It must be authenticated for the
   repository you are working on.
-- `spec` writes a document only when asked and stops for approval before
-  implementation.
+- `adr` drafts one record in the repository's ADR system and stops before code.
+  It reads the repository's guide before using its default template.
+- `spec` writes a proposal or design spec only when asked and stops for approval
+  before implementation. It reviews ADRs but does not draft them.
 - `reflect` applies an explicit workflow change and proposes an exploratory one
   before editing a skill. It does not rewrite the library on its own.
 - `repo-quiz` is read-only. It never edits the repository.

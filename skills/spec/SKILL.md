@@ -1,6 +1,6 @@
 ---
 name: spec
-description: Write or review an ADR, proposal, or design spec that directs implementation. Covers the problem, goals, non-goals, constraints, options, numbered decisions, interfaces, data flow, failure modes, migration, rollback, test plan, and commit-sized steps. Use when the user says write a spec, design this, write a proposal, write an ADR, review this design, or asks how to implement a feature before coding. Stop for approval before implementation.
+description: Write or review a proposal or design spec, or review an ADR. Covers the problem, goals, non-goals, constraints, options, numbered decisions, interfaces, data flow, failure modes, migration, rollback, test plan, and commit-sized steps. Use when the user says write a spec, design this, write a proposal, review this design, review an ADR, or asks how to implement a feature before coding. For drafting a single ADR, use the adr skill. Stop for approval before implementation.
 ---
 
 # Spec
@@ -30,8 +30,8 @@ opinions.
 Use the repository's existing convention first. Read `docs/adr`, `docs/rfcs`,
 `docs/proposals`, `AGENTS.md`, and the README before creating a new file.
 
-- ADR: one decision. Short. Context, decision, status, consequences, alternatives,
-  and references. Accepted ADRs are historical records.
+- ADR: one decision. Draft it with the `adr` skill; review it here. Accepted ADRs
+  are historical records.
 - Proposal: a larger change with options and a recommendation, written before the
   decision is final. It can be revised as the discussion changes.
 - Design spec: the accepted design with enough detail to implement. It can be
