@@ -145,16 +145,27 @@ If the right change is a new skill, include:
 
 ## Apply
 
-For an explicit change:
+For an explicit change, do the apply, test, commit, and push in a background
+subagent:
 
 1. Identify the skill and the exact section.
-2. Apply the smallest patch, not a full rewrite.
-3. Update the README if the skill list, invocation, or install layout changed.
-4. Run `tests/install_test.sh` in the skills repository.
-5. Run the trigger test if the change touches the reflect trigger.
-6. Verify the skill is registered if the agent exposes a skill list.
-7. Commit with a one-line, problem-focused message.
-8. Report the diff, the tests, and the commit.
+2. Prepare the smallest patch and the library path. Pass the subagent the exact
+   old and new text, the files it may touch, the test command, the commit
+   message, and the push instruction.
+3. Spawn the subagent in background mode. It applies the patch, not a full
+   rewrite, updates the README if the skill list, invocation, or install layout
+   changed, runs `tests/install_test.sh`, and runs the trigger test if the
+   change touches the reflect trigger.
+4. The subagent commits with a one-line, problem-focused message and pushes the
+   current branch by default.
+5. Verify the skill is registered if the agent exposes a skill list.
+6. Report the diff, the tests, the commit, and the push result when the
+   subagent returns.
+
+Commit and push by default. Do not push when the user asks not to, when the
+change is exploratory, or when the repository has unrelated staged changes that
+would be included. Commit only the intended files, or stop and ask. If the push
+is rejected, leave the commit local and report the error.
 
 For an exploratory change, stop after the proposal and wait for approval.
 
