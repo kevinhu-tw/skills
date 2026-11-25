@@ -332,6 +332,7 @@ that unblocks the work. Do not turn the request into a full design program.
 - Do not write a vague architecture essay. Every section must change what the
   implementer does.
 - Do not over-specify code that is cheap to change during implementation.
+- Do not put machine-specific local environment values, such as personal hostnames, Docker context names, or home paths, into specifications or implementation plans unless the user explicitly requests them. Prefer portable requirements and generic configuration interfaces.
 - Do not use dashes as punctuation.
 - Do not use question words as headings. Use Scope, Execution, Implementation
   decisions, Workarounds, Risks.

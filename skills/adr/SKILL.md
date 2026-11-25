@@ -143,5 +143,6 @@ ambiguous or an accepted ADR blocks it, ask one question and stop.
 - Do not invent evidence, requirements, or user intent.
 - Do not create a second record when an existing proposed ADR is the right home.
 - Do not duplicate a guide the repository already has. Read and follow it.
+- Do not put machine-specific local environment values, such as personal hostnames, Docker context names, or home paths, into architecture decisions unless the user explicitly requests them. Prefer portable requirements and generic configuration interfaces.
 - Do not use dashes as punctuation.
 - Do not turn the ADR into an implementation spec. Use `spec` for that.
