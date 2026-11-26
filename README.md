@@ -10,7 +10,7 @@ Code, Cursor, and Codex read.
 | --- | --- | --- |
 | `repo-quiz` | `/quiz` | Adaptive oral exam over a repo or topic, graded against the code |
 | `pr-create` | `/pr-create` | Validate a branch, self-review the diff, and open or update a PR |
-| `pr-review` | `/pr-review` | Explain a change, then review architecture, design, implementation, and security |
+| `pr-review` | `/pr-review` | Explain a change, then review architecture, design, implementation, security, and whole-repo hygiene |
 | `adr` | `/adr` | Record one decision and its evidence in the repository's ADR system |
 | `spec` | `/spec` | Write or review an implementation spec that an AI agent can execute |
 | `reflect` | `/reflect` | Turn corrections into the smallest useful skill patch |
@@ -62,6 +62,8 @@ Explains the architecture and the change before judging it, then reviews:
   supply chain, and unsafe defaults.
 - Claims versus behavior: the PR body, comments, docs, and tests that say more
   than the code does.
+- Repository: layout, documentation quality, duplicate logic, leaked local or
+  user data, and undocumented hacks.
 
 Findings are ranked by severity and cite `path:line`. The skill is read-only by
 default.

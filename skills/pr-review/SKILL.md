@@ -19,6 +19,7 @@ the user asks.
 - A branch name: that branch against the default base.
 - A commit range: that range.
 - A path to a markdown file: a design review.
+- A repository with no diff: a whole implementation review.
 - A focus area: review that area first, but do not skip the other axes.
 
 ## Establish the scope
@@ -148,6 +149,26 @@ the change, say what is missing instead of guessing.
 - An error message that promises a recovery the code does not implement is a
   finding.
 - A migration or compatibility claim needs evidence, not a sentence.
+
+### Repository review
+
+When the input is a whole repository or implementation rather than a diff, review
+the repository as a unit in addition to the axes above:
+
+- Layout and ownership: each file has one clear job and the tree shows the
+  architecture. Flag file sprawl, layer leaks, and logic buried in an entry
+  point.
+- Documentation: the README and architecture docs let a new reviewer understand
+  and run the system. Flag stale claims, missing setup steps, and prose that
+  restates code without adding a decision.
+- Redundancy: duplicate helpers, constants, defaults, configuration, and
+  parallel workflows. Identify the source of truth for each.
+- Repository hygiene: committed absolute local paths, usernames, home
+  directories, machine names, tokens, credentials, generated artifacts, and
+  editor or agent state. Quote the pattern, not the secret.
+- Hacks: every workaround, pinned version, disabled check, temporary shim, and
+  hard-coded assumption is documented with why it exists, its constraint, and
+  when it can be removed.
 
 ## Findings
 
